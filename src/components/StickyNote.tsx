@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { StickyNote, UpdateStickyNote } from '@/types';
@@ -17,6 +18,10 @@ interface StickyNoteProps {
 }
 
 export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = false }: StickyNoteProps) {
+  const t = useTranslations('stickyNotes');
+  const tColors = useTranslations('colors');
+  const tCommon = useTranslations('common');
+  const tDrag = useTranslations('dragAndDrop');
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(stickyNote.content);
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -38,6 +43,7 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
       stickyNote,
     },
     disabled: isEditing,
+    attributes: { roleDescription: tDrag('sortable') },
   });
 
   const style = {
@@ -97,8 +103,8 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
             setShowColorPicker(!showColorPicker);
           }}
           className={menuButton}
-          title="Change color"
-          aria-label="Change color"
+          title={t('changeColor')}
+          aria-label={t('changeColor')}
           aria-expanded={showColorPicker}
         >
           <Palette size={16} />
@@ -110,8 +116,8 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
             setIsEditing(true);
           }}
           className={menuButton}
-          title="Edit sticky note"
-          aria-label="Edit sticky note"
+          title={t('edit')}
+          aria-label={t('edit')}
         >
           <Edit2 size={16} />
         </button>
@@ -121,8 +127,8 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
             onDelete(stickyNote.id);
           }}
           className={`${menuButton} is-danger`}
-          title="Delete sticky note"
-          aria-label="Delete sticky note"
+          title={t('delete')}
+          aria-label={t('delete')}
         >
           <Trash2 size={16} />
         </button>
@@ -134,17 +140,17 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
           onPointerDown={(e) => e.stopPropagation()}
         >
           <div className="grid w-max grid-cols-3 gap-2">
-            {STICKY_COLORS.map((option) => (
+            {STICKY_COLORS.map((color) => (
               <button
-                key={option.value}
-                onClick={() => handleColorChange(option.value)}
+                key={color}
+                onClick={() => handleColorChange(color)}
                 style={{ backgroundColor: 'var(--sticky)', borderColor: 'var(--sticky-edge)' }}
-                className={`sticky-${option.value} h-8 w-8 rounded-md border-2 transition-transform duration-200 hover:scale-110 ${
-                  option.value === stickyNote.color ? 'ring-2 ring-gray-800 ring-offset-2 ring-offset-white' : ''
+                className={`sticky-${color} h-8 w-8 rounded-md border-2 transition-transform duration-200 hover:scale-110 ${
+                  color === stickyNote.color ? 'ring-2 ring-gray-800 ring-offset-2 ring-offset-white' : ''
                 }`}
-                title={option.name}
-                aria-label={option.name}
-                aria-pressed={option.value === stickyNote.color}
+                title={tColors(color)}
+                aria-label={tColors(color)}
+                aria-pressed={color === stickyNote.color}
               />
             ))}
           </div>
@@ -157,17 +163,17 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="h-full w-full flex-1 resize-none overflow-y-auto border-none p-0 text-sm outline-hidden [overflow-wrap:anywhere]"
-            placeholder="Write your note..."
-            aria-label="Sticky note text"
+            placeholder={t('placeholder')}
+            aria-label={t('textLabel')}
             maxLength={500}
             autoFocus
           />
           <div className="mt-2 flex gap-1.5">
             <button type="button" onClick={handleSave} className="sticky-save">
-              Save
+              {tCommon('save')}
             </button>
             <button type="button" onClick={handleCancel} className="sticky-cancel">
-              Cancel
+              {tCommon('cancel')}
             </button>
           </div>
         </div>
@@ -190,7 +196,7 @@ export function StickyNote({ stickyNote, onUpdate, onDelete, isHighlighted = fal
               {stickyNote.content}
             </ReactMarkdown>
           ) : (
-            <span className="sticky-muted">Write your note...</span>
+            <span className="sticky-muted">{t('placeholder')}</span>
           )}
         </div>
       )}

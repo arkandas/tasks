@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { TodoItem as TodoItemType, CreateTodoItem, UpdateTodoItem } from '@/types';
 import { TodoItem } from '@/components/TodoItem';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { todoApi } from '@/lib/api';
+import { useDndAccessibility } from '@/lib/use-dnd-accessibility';
 import { Plus, ListTodo, Trash2 } from 'lucide-react';
 import {
   DndContext,
@@ -28,6 +30,9 @@ const byListOrder = (a: TodoItemType, b: TodoItemType) =>
   b.created_at.localeCompare(a.created_at);
 
 export function TodoList({ highlightId = null }: { highlightId?: number | null }) {
+  const t = useTranslations('todos');
+  const tCommon = useTranslations('common');
+  const dndAccessibility = useDndAccessibility();
   const [todos, setTodos] = useState<TodoItemType[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoItemType | null>(null);
@@ -200,6 +205,7 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      accessibility={dndAccessibility}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveTodo(null)}
@@ -207,13 +213,13 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
       <div ref={listRef} className="themed-scroll h-full overflow-y-auto overscroll-contain bg-canvas px-4 py-5 sm:px-8 sm:py-8">
         <div className="mx-auto max-w-3xl space-y-5 sm:space-y-6">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-xl font-bold tracking-tight text-ink sm:text-2xl">To-Do</h2>
+            <h2 className="text-xl font-bold tracking-tight text-ink sm:text-2xl">{t('title')}</h2>
             <Button
               onClick={() => setIsCreating(true)}
               className="h-11 shrink-0 text-base sm:h-10 sm:text-sm"
             >
               <Plus size={16} className="mr-2" />
-              New item
+              {t('new')}
             </Button>
           </div>
 
@@ -221,7 +227,7 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
             <div className="space-y-2.5">
               <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
                 <ListTodo size={14} />
-                Active
+                {t('active')}
                 <span className="tabular-nums">{activeTodos.length}</span>
               </h3>
               <SortableContext items={activeTodos.map(t => t.id)} strategy={verticalListSortingStrategy}>
@@ -244,17 +250,17 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
               <div className="flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
                   <ListTodo size={14} />
-                  Completed
+                  {t('completed')}
                   <span className="tabular-nums">{completedTodos.length}</span>
                 </h3>
                 <button
                   onClick={handleClearCompleted}
                   className="-my-2 flex h-9 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-ink-muted transition-colors hover:bg-danger-soft hover:text-danger"
-                  title="Clear completed"
-                  aria-label="Clear completed"
+                  title={t('clearCompleted')}
+                  aria-label={t('clearCompleted')}
                 >
                   <Trash2 size={14} />
-                  Clear
+                  {t('clear')}
                 </button>
               </div>
               <SortableContext items={completedTodos.map(t => t.id)} strategy={verticalListSortingStrategy}>
@@ -276,11 +282,11 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
             <div className="flex min-h-[400px] items-center justify-center">
               <div className="text-center">
                 <ListTodo size={64} className="mx-auto mb-4 text-ink-faint" />
-                <h3 className="mb-2 text-xl font-semibold text-ink">No items yet</h3>
-                <p className="mb-5 text-ink-muted">Add your first item to get started</p>
+                <h3 className="mb-2 text-xl font-semibold text-ink">{t('empty.title')}</h3>
+                <p className="mb-5 text-ink-muted">{t('empty.description')}</p>
                 <Button onClick={() => setIsCreating(true)} className="h-11 text-base sm:h-10 sm:text-sm">
                   <Plus size={16} className="mr-2" />
-                  New item
+                  {t('new')}
                 </Button>
               </div>
             </div>
@@ -291,7 +297,7 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
       <Dialog open={isCreating} onClose={resetForm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingTodo ? 'Edit item' : 'New item'}</DialogTitle>
+            <DialogTitle>{editingTodo ? t('edit') : t('new')}</DialogTitle>
             <DialogClose onClick={resetForm} />
           </DialogHeader>
           <form onSubmit={(e) => {
@@ -300,28 +306,28 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
           }}>
             <div className="space-y-4 sm:space-y-5">
               <div>
-                <label htmlFor="todo-title" className="mb-1.5 block text-sm font-medium text-ink-muted">Title</label>
+                <label htmlFor="todo-title" className="mb-1.5 block text-sm font-medium text-ink-muted">{t('titleLabel')}</label>
                 <Input
                   id="todo-title"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Enter item title..."
+                  placeholder={t('titlePlaceholder')}
                   autoFocus
                   required
                 />
               </div>
               <div>
-                <label htmlFor="todo-description" className="mb-1.5 block text-sm font-medium text-ink-muted">Description (Optional)</label>
+                <label htmlFor="todo-description" className="mb-1.5 block text-sm font-medium text-ink-muted">{t('descriptionLabel')}</label>
                 <Textarea
                   id="todo-description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Add more details..."
+                  placeholder={t('descriptionPlaceholder')}
                   rows={3}
                 />
               </div>
               <div>
-                <label htmlFor="todo-deadline" className="mb-1.5 block text-sm font-medium text-ink-muted">Deadline (Optional)</label>
+                <label htmlFor="todo-deadline" className="mb-1.5 block text-sm font-medium text-ink-muted">{t('deadlineLabel')}</label>
                 <Input
                   id="todo-deadline"
                   type="date"
@@ -337,14 +343,14 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
                   onClick={resetForm}
                   className="w-full sm:w-auto"
                 >
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="w-full sm:w-auto"
                   disabled={!formData.title.trim()}
                 >
-                  {editingTodo ? 'Update' : 'Create'}
+                  {editingTodo ? t('update') : t('create')}
                 </Button>
               </div>
             </div>

@@ -14,6 +14,7 @@ import {
   closestCenter,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
+import { useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import {
   Board as BoardType,
@@ -31,6 +32,7 @@ import { Select } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { boardApi, sectionApi, taskApi } from '@/lib/api';
+import { useDndAccessibility } from '@/lib/use-dnd-accessibility';
 import { Plus, Edit3, Menu } from 'lucide-react';
 
 interface BoardProps {
@@ -46,7 +48,15 @@ const MAX_SECTIONS = 6;
 const SECTION_WIDTH =
   'w-[86vw] min-w-[250px] max-w-[330px] sm:w-[220px] sm:min-w-[180px] sm:max-w-none md:w-[230px] lg:w-[240px] xl:w-[250px]';
 
+const strong = (chunks: React.ReactNode) => <strong className="text-ink">{chunks}</strong>;
+
 export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList, highlightTaskId = null }: BoardProps) {
+  const t = useTranslations('board');
+  const tSection = useTranslations('section');
+  const tTask = useTranslations('task');
+  const tPriority = useTranslations('priority');
+  const tCommon = useTranslations('common');
+  const dndAccessibility = useDndAccessibility();
   const [board, setBoard] = useState<BoardType>(initialBoard);
   const [prevInitialBoard, setPrevInitialBoard] = useState(initialBoard);
   const [isAddingSection, setIsAddingSection] = useState(false);
@@ -585,7 +595,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
       <Dialog open={showBoardDialog} onClose={handleCancelBoardEdit}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Board</DialogTitle>
+            <DialogTitle>{t('editTitle')}</DialogTitle>
             <DialogClose onClick={handleCancelBoardEdit} />
           </DialogHeader>
 
@@ -597,15 +607,15 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
               <Input
                 value={editingTitle}
                 onChange={(e) => setEditingTitle(e.target.value)}
-                placeholder="Board title..."
-                aria-label="Board title"
+                placeholder={t('titlePlaceholder')}
+                aria-label={t('titleLabel')}
               />
 
               <Textarea
                 value={editingDescription}
                 onChange={(e) => setEditingDescription(e.target.value)}
-                placeholder="Description..."
-                aria-label="Board description"
+                placeholder={t('descriptionPlaceholder')}
+                aria-label={t('descriptionLabel')}
                 rows={2}
               />
 
@@ -616,12 +626,12 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                   onClick={handleRequestDeleteBoard}
                   className="w-full sm:w-auto"
                 >
-                  Delete Board
+                  {t('delete')}
                 </Button>
 
                 <div className="flex gap-2">
-                  <Button type="submit" className="flex-1 sm:flex-none">Save</Button>
-                  <Button type="button" variant="outline" onClick={handleCancelBoardEdit} className="flex-1 sm:flex-none">Cancel</Button>
+                  <Button type="submit" className="flex-1 sm:flex-none">{tCommon('save')}</Button>
+                  <Button type="button" variant="outline" onClick={handleCancelBoardEdit} className="flex-1 sm:flex-none">{tCommon('cancel')}</Button>
                 </div>
               </div>
             </div>
@@ -631,47 +641,46 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
 
       <ConfirmDialog
         open={showDeleteBoardDialog}
-        title="Delete Board"
-        confirmLabel="Delete Board"
+        title={t('delete')}
+        confirmLabel={t('delete')}
         onConfirm={handleConfirmDeleteBoard}
         onCancel={() => setShowDeleteBoardDialog(false)}
       >
-        Are you sure you want to delete the board <strong className="text-ink">&quot;{board.title}&quot;</strong>?
+        {t.rich('deleteConfirm', { title: board.title, strong })}
         {board.sections.length > 0 && (
           <span className="mt-2 block font-medium text-danger">
-            This will also delete {board.sections.length} section{board.sections.length !== 1 ? 's' : ''}
-            {boardTaskCount > 0 && ` and ${boardTaskCount} task${boardTaskCount !== 1 ? 's' : ''}`}.
+            {t('deleteContents', { sections: board.sections.length, tasks: boardTaskCount })}
           </span>
         )}
       </ConfirmDialog>
 
       <ConfirmDialog
         open={sectionToDelete !== null}
-        title="Delete Section"
+        title={tSection('deleteTitle')}
         onConfirm={handleConfirmDeleteSection}
         onCancel={() => setSectionToDelete(null)}
       >
-        Are you sure you want to delete the section <strong className="text-ink">&quot;{sectionToDelete?.title}&quot;</strong>?
+        {tSection.rich('deleteConfirm', { title: sectionToDelete?.title ?? '', strong })}
         {sectionToDelete && sectionToDelete.taskCount > 0 && (
           <span className="mt-2 block font-medium text-danger">
-            This will also delete {sectionToDelete.taskCount} task{sectionToDelete.taskCount !== 1 ? 's' : ''} in this section.
+            {tSection('deleteTasks', { count: sectionToDelete.taskCount })}
           </span>
         )}
       </ConfirmDialog>
 
       <ConfirmDialog
         open={taskToDelete !== null}
-        title="Delete Task"
+        title={tTask('deleteTitle')}
         onConfirm={handleConfirmDeleteTask}
         onCancel={() => setTaskToDelete(null)}
       >
-        Are you sure you want to delete the task <strong className="text-ink">&quot;{taskToDelete?.title}&quot;</strong>?
+        {tTask.rich('deleteConfirm', { title: taskToDelete?.title ?? '', strong })}
       </ConfirmDialog>
 
       <Dialog open={taskDialogMode !== null} onClose={handleCancelTaskDialog}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{taskDialogMode === 'create' ? 'Create New Task' : 'Edit Task'}</DialogTitle>
+            <DialogTitle>{taskDialogMode === 'create' ? tTask('createTitle') : tTask('editTitle')}</DialogTitle>
             <DialogClose onClick={handleCancelTaskDialog} />
           </DialogHeader>
           <form onSubmit={(e) => {
@@ -682,8 +691,8 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
               <Input
                 value={taskTitle}
                 onChange={(e) => setTaskTitle(e.target.value)}
-                placeholder="Task title..."
-                aria-label="Task title"
+                placeholder={tTask('titlePlaceholder')}
+                aria-label={tTask('titleLabel')}
                 maxLength={100}
                 autoFocus
                 required
@@ -691,15 +700,15 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
               <Textarea
                 value={taskDescription}
                 onChange={(e) => setTaskDescription(e.target.value)}
-                placeholder="Task description (optional, markdown supported)..."
-                aria-label="Task description"
+                placeholder={tTask('descriptionPlaceholder')}
+                aria-label={tTask('descriptionLabel')}
                 rows={6}
                 maxLength={1000}
                 className="h-28 sm:h-auto"
               />
               {taskDialogMode === 'edit' && board.sections.length > 1 && (
                 <div className="sm:hidden">
-                  <label htmlFor="task-section" className="mb-1.5 block text-sm font-medium text-ink-muted">Section</label>
+                  <label htmlFor="task-section" className="mb-1.5 block text-sm font-medium text-ink-muted">{tTask('section')}</label>
                   <Select
                     id="task-section"
                     value={taskSectionId ?? ''}
@@ -713,20 +722,20 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
               )}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="task-priority" className="mb-1.5 block text-sm font-medium text-ink-muted">Priority</label>
+                  <label htmlFor="task-priority" className="mb-1.5 block text-sm font-medium text-ink-muted">{tTask('priority')}</label>
                   <Select
                     id="task-priority"
                     value={taskPriority}
                     onChange={(e) => setTaskPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT')}
                   >
-                    <option value="LOW">Low</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HIGH">High</option>
-                    <option value="URGENT">Urgent</option>
+                    <option value="LOW">{tPriority('low')}</option>
+                    <option value="MEDIUM">{tPriority('medium')}</option>
+                    <option value="HIGH">{tPriority('high')}</option>
+                    <option value="URGENT">{tPriority('urgent')}</option>
                   </Select>
                 </div>
                 <div>
-                  <label htmlFor="task-deadline" className="mb-1.5 block text-sm font-medium text-ink-muted">Deadline</label>
+                  <label htmlFor="task-deadline" className="mb-1.5 block text-sm font-medium text-ink-muted">{tTask('deadline')}</label>
                   <Input
                     id="task-deadline"
                     type="date"
@@ -743,10 +752,10 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                   onClick={handleCancelTaskDialog}
                   className="w-full sm:w-auto"
                 >
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
                 <Button type="submit" className="w-full sm:w-auto">
-                  {taskDialogMode === 'create' ? 'Create Task' : 'Save Changes'}
+                  {taskDialogMode === 'create' ? tTask('create') : tTask('saveChanges')}
                 </Button>
               </div>
             </div>
@@ -757,6 +766,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
+        accessibility={dndAccessibility}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -772,7 +782,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                 type="button"
                 onClick={onOpenBoardList}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-canvas md:hidden"
-                aria-label="Show boards"
+                aria-label={t('showBoards')}
               >
                 <Menu size={20} />
               </button>
@@ -792,11 +802,11 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
               type="button"
               onClick={handleStartEditingBoard}
               className="flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-canvas hover:text-ink max-sm:w-10 max-sm:px-0"
-              title="Edit board"
-              aria-label="Edit board"
+              title={t('editLabel')}
+              aria-label={t('editLabel')}
             >
               <Edit3 size={16} />
-              <span className="hidden sm:inline">Edit</span>
+              <span className="hidden sm:inline">{t('edit')}</span>
             </button>
           </div>
 
@@ -833,7 +843,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                   type="button"
                   onClick={() => setIsAddingSection(true)}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas text-ink-muted transition-colors active:bg-muted"
-                  aria-label="Add section"
+                  aria-label={t('addSectionLabel')}
                 >
                   <Plus size={16} />
                 </button>
@@ -868,8 +878,8 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                     <Input
                       value={newSectionTitle}
                       onChange={(e) => setNewSectionTitle(e.target.value)}
-                      placeholder="Enter section title..."
-                      aria-label="Section title"
+                      placeholder={t('sectionPlaceholder')}
+                      aria-label={tSection('titleLabel')}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleCreateSection();
                         if (e.key === 'Escape') {
@@ -881,7 +891,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                     />
                     <div className="mt-3 flex gap-2">
                       <Button size="sm" onClick={handleCreateSection}>
-                        Add Section
+                        {t('addSection')}
                       </Button>
                       <Button
                         variant="outline"
@@ -891,7 +901,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                           setNewSectionTitle('');
                         }}
                       >
-                        Cancel
+                        {tCommon('cancel')}
                       </Button>
                     </div>
                   </div>
@@ -902,7 +912,7 @@ export function Board({ board: initialBoard, onUpdate, onDelete, onOpenBoardList
                     className={`section-col flex h-12 shrink-0 items-center justify-center gap-2 self-start rounded-xl border-2 border-dashed border-line-strong text-sm font-medium text-ink-muted transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent ${SECTION_WIDTH}`}
                   >
                     <Plus size={18} />
-                    Add Section
+                    {t('addSection')}
                   </button>
                 ))}
               </div>

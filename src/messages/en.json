@@ -1,0 +1,289 @@
+{
+  "app": {
+    "title": "Tasks - Boards, To-Dos and Sticky Notes",
+    "description": "Kanban boards, a to-do list and a sticky note board for keeping track of your work.",
+    "tagline": "Boards, to-dos and sticky notes"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "close": "Close"
+  },
+  "views": {
+    "label": "Views",
+    "boards": "Boards",
+    "todos": "To-Do",
+    "stickyNotes": "Sticky Notes"
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "toggle": "Theme: {theme}. Click to change."
+  },
+  "language": {
+    "label": "Language",
+    "toggle": "Language: {language}. Click to change."
+  },
+  "userMenu": {
+    "accountMenu": "Account menu",
+    "manageUsers": "Manage Users",
+    "signOut": "Sign Out"
+  },
+  "roles": {
+    "ADMIN": "Admin",
+    "USER": "User"
+  },
+  "login": {
+    "username": "Username",
+    "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "setupDone": "Account created. Sign in to continue.",
+    "invalidCredentials": "Invalid username or password",
+    "failed": "An error occurred during login",
+    "oidc": {
+      "submit": "Sign in with {provider}",
+      "redirecting": "Redirecting to {provider}…",
+      "failed": "Sign-in with {provider} failed. Try again.",
+      "accessDenied": "That {provider} account can't sign in to Tasks: it has no email, or another {provider} account already uses its email here. To use a different account, sign out of {provider} first.",
+      "signedOut": "You signed out of Tasks."
+    }
+  },
+  "setup": {
+    "tagline": "Create the administrator account",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least {min} characters",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least {min} characters",
+    "submit": "Create admin account",
+    "submitting": "Creating account…",
+    "note": "This account has administrator privileges. You can add more users later."
+  },
+  "boards": {
+    "closeList": "Close board list",
+    "loading": "Loading your boards…",
+    "loadFailed": "Unable to load your boards. Please check your database connection.",
+    "reorder": "Drag to reorder boards",
+    "new": "New board",
+    "create": {
+      "title": "Create New Board",
+      "titleLabel": "Board Title",
+      "titlePlaceholder": "Enter board title…",
+      "descriptionLabel": "Description (Optional)",
+      "descriptionPlaceholder": "Describe what this board is for…",
+      "submit": "Create Board"
+    },
+    "empty": {
+      "title": "No boards yet",
+      "description": "Create your first board to get started"
+    },
+    "select": {
+      "title": "Select a board",
+      "fromSidebar": "Choose a board from the sidebar to view its contents",
+      "fromList": "Choose a board to view its contents",
+      "browse": "Browse boards"
+    }
+  },
+  "search": {
+    "placeholder": "Search…",
+    "label": "Search tasks, to-dos and sticky notes",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "noResults": "No results for “{query}”",
+    "tasks": "Tasks"
+  },
+  "board": {
+    "showBoards": "Show boards",
+    "edit": "Edit",
+    "editLabel": "Edit board",
+    "editTitle": "Edit Board",
+    "titleLabel": "Board title",
+    "titlePlaceholder": "Board title…",
+    "descriptionLabel": "Board description",
+    "descriptionPlaceholder": "Description…",
+    "delete": "Delete Board",
+    "deleteConfirm": "Are you sure you want to delete the board <strong>\"{title}\"</strong>?",
+    "deleteContents": "This will also delete {sections, plural, one {# section} other {# sections}}{tasks, plural, =0 {} one { and # task} other { and # tasks}}.",
+    "addSection": "Add Section",
+    "addSectionLabel": "Add section",
+    "sectionPlaceholder": "Enter section title…"
+  },
+  "section": {
+    "titleLabel": "Section title",
+    "rename": "{title} (click to rename)",
+    "delete": "Delete section",
+    "deleteTitle": "Delete Section",
+    "deleteConfirm": "Are you sure you want to delete the section <strong>\"{title}\"</strong>?",
+    "deleteTasks": "This will also delete {count, plural, one {# task} other {# tasks}} in this section.",
+    "dropHere": "Drop tasks here",
+    "addTask": "Add task"
+  },
+  "task": {
+    "createTitle": "Create New Task",
+    "editTitle": "Edit Task",
+    "titleLabel": "Task title",
+    "titlePlaceholder": "Task title…",
+    "descriptionLabel": "Task description",
+    "descriptionPlaceholder": "Task description (optional, markdown supported)…",
+    "section": "Section",
+    "priority": "Priority",
+    "deadline": "Deadline",
+    "create": "Create Task",
+    "saveChanges": "Save Changes",
+    "edit": "Edit task",
+    "delete": "Delete task",
+    "deleteTitle": "Delete Task",
+    "deleteConfirm": "Are you sure you want to delete the task <strong>\"{title}\"</strong>?"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "todos": {
+    "title": "To-Do",
+    "new": "New item",
+    "edit": "Edit item",
+    "delete": "Delete item",
+    "active": "Active",
+    "completed": "Completed",
+    "clear": "Clear",
+    "clearCompleted": "Clear completed",
+    "markComplete": "Mark as complete",
+    "markIncomplete": "Mark as incomplete",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Enter item title…",
+    "descriptionLabel": "Description (Optional)",
+    "descriptionPlaceholder": "Add more details…",
+    "deadlineLabel": "Deadline (Optional)",
+    "create": "Create",
+    "update": "Update",
+    "empty": {
+      "title": "No items yet",
+      "description": "Add your first item to get started"
+    }
+  },
+  "stickyNotes": {
+    "loading": "Loading your sticky notes…",
+    "loadFailed": "Unable to load your sticky notes. Please check your database connection.",
+    "add": "Add note",
+    "placeholder": "Write your note…",
+    "textLabel": "Sticky note text",
+    "changeColor": "Change color",
+    "edit": "Edit sticky note",
+    "delete": "Delete sticky note",
+    "emptyNote": "Empty note",
+    "trash": "Trash",
+    "trashCount": "Trash ({count})",
+    "emptyTrash": "Empty trash",
+    "deleteCount": "Delete {count}",
+    "backToNotes": "Back to notes",
+    "restore": "Restore note",
+    "deleted": "Deleted {date}",
+    "trashEmpty": {
+      "title": "The trash is empty",
+      "description": "Deleted sticky notes will appear here"
+    },
+    "empty": {
+      "title": "No sticky notes yet",
+      "description": "Create your first sticky note to get started",
+      "create": "Create Sticky Note"
+    }
+  },
+  "colors": {
+    "yellow": "Yellow",
+    "blue": "Blue",
+    "green": "Green",
+    "pink": "Pink",
+    "orange": "Orange",
+    "purple": "Purple",
+    "cyan": "Cyan",
+    "red": "Red",
+    "lime": "Lime"
+  },
+  "users": {
+    "title": "User Management",
+    "add": "Add New User",
+    "createTitle": "Create New User",
+    "create": "Create User",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "email": "Email",
+    "emailPlaceholder": "Enter email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password (min. {min} characters)",
+    "role": "Role",
+    "list": "Users",
+    "loading": "Loading users…",
+    "deleteUser": "Delete user",
+    "deleteNamed": "Delete {name}"
+  },
+  "dragAndDrop": {
+    "sortable": "sortable",
+    "instructions": "To pick up a draggable item, press the space bar. While dragging, use the arrow keys to move the item. Press space again to drop the item in its new position, or press escape to cancel.",
+    "pickedUp": "Picked up draggable item {id}.",
+    "movedOver": "Draggable item {id} was moved over droppable area {over}.",
+    "notOver": "Draggable item {id} is no longer over a droppable area.",
+    "droppedOver": "Draggable item {id} was dropped over droppable area {over}.",
+    "dropped": "Draggable item {id} was dropped.",
+    "canceled": "Dragging was canceled. Draggable item {id} was dropped."
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "unauthorized": "Unauthorized",
+    "usersManagedByProvider": "Users are managed by the identity provider",
+    "missingFields": "Missing required fields",
+    "invalidEmail": "Invalid email address",
+    "passwordLength": "Password must be between {min} and {max} characters",
+    "invalidRole": "Invalid role",
+    "userExists": "Username or email already exists",
+    "userNotFound": "User not found",
+    "cannotDeleteSelf": "Cannot delete your own account",
+    "fetchUsersFailed": "Failed to fetch users",
+    "createUserFailed": "Failed to create user",
+    "deleteUserFailed": "Failed to delete user"
+  },
+  "errorScreen": {
+    "unexpected": "An unexpected error occurred",
+    "tryAgain": "Try Again",
+    "whatToTry": "What you can try",
+    "technicalDetails": "Technical Details",
+    "database": {
+      "title": "Database Connection Issue",
+      "description": "Unable to connect to the database. This might be a temporary issue.",
+      "tip1": "Check if the database is running",
+      "tip2": "Verify database connection settings",
+      "tip3": "Try refreshing the page"
+    },
+    "network": {
+      "title": "Network Connection Error",
+      "description": "Unable to reach the server. Please check your internet connection.",
+      "tip1": "Check your internet connection",
+      "tip2": "Try refreshing the page",
+      "tip3": "Wait a moment and try again"
+    },
+    "timeout": {
+      "title": "Request Timeout",
+      "description": "The request took too long to complete.",
+      "tip1": "The server might be busy",
+      "tip2": "Try again in a moment",
+      "tip3": "Check your connection speed"
+    },
+    "general": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred while loading your data.",
+      "tip1": "Try refreshing the page",
+      "tip2": "Check if the issue persists",
+      "tip3": "Check the server logs if the problem continues"
+    }
+  }
+}

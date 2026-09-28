@@ -10,6 +10,7 @@ import {
   useSensors,
   closestCenter,
 } from '@dnd-kit/core';
+import { useLocale, useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { StickyNote, CreateStickyNote, UpdateStickyNote } from '@/types';
@@ -19,6 +20,7 @@ import { LoadingScreen } from './LoadingScreen';
 import { ErrorScreen } from './ErrorScreen';
 import { stickyNoteApi } from '@/lib/api';
 import { stickyColorClass } from '@/lib/sticky-colors';
+import { useDndAccessibility } from '@/lib/use-dnd-accessibility';
 import { Plus, Trash2, RotateCcw } from 'lucide-react';
 
 function withZIndex(notes: StickyNote[]) {
@@ -35,13 +37,17 @@ function withZIndex(notes: StickyNote[]) {
 }
 
 export function Corkboard({ highlightId = null }: { highlightId?: number | null }) {
+  const t = useTranslations('stickyNotes');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const dndAccessibility = useDndAccessibility();
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([]);
   const [deletedNotes, setDeletedNotes] = useState<StickyNote[]>([]);
   const [showTrash, setShowTrash] = useState(false);
   const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
   const [activeStickyNote, setActiveStickyNote] = useState<StickyNote | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -57,7 +63,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
       .then(fetchedStickyNotes => setStickyNotes(withZIndex(fetchedStickyNotes)))
       .catch(error => {
         console.error('Failed to load sticky notes:', error);
-        setError('Unable to load your sticky notes. Please check your database connection.');
+        setError(true);
       })
       .finally(() => setLoading(false));
 
@@ -72,7 +78,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
   }, []);
 
   const retryLoadStickyNotes = () => {
-    setError(null);
+    setError(false);
     setLoading(true);
     loadStickyNotes();
   };
@@ -225,11 +231,11 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
   };
 
   if (loading) {
-    return <LoadingScreen message="Loading your sticky notes..." />;
+    return <LoadingScreen message={t('loading')} />;
   }
 
   if (error) {
-    return <ErrorScreen error={error} onRetry={retryLoadStickyNotes} />;
+    return <ErrorScreen type="database" error={t('loadFailed')} onRetry={retryLoadStickyNotes} />;
   }
 
   const floatingButton = 'h-9 border bg-surface shadow-md sm:h-8';
@@ -240,7 +246,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
       {trashVisible && (
         <div className="absolute left-3 top-3 z-[1100] sm:left-4 sm:top-4">
           <span className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink shadow-md sm:h-8">
-            Trash
+            {t('trash')}
             {deletedNotes.length > 0 && (
               <span className="font-normal tabular-nums text-ink-muted">{deletedNotes.length} / 50</span>
             )}
@@ -260,7 +266,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
                     size="sm"
                     className="h-9 shadow-md sm:h-8"
                   >
-                    Delete {deletedNotes.length}
+                    {t('deleteCount', { count: deletedNotes.length })}
                   </Button>
                   <Button
                     onClick={() => setConfirmEmptyTrash(false)}
@@ -268,7 +274,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
                     size="sm"
                     className={floatingButton}
                   >
-                    Cancel
+                    {tCommon('cancel')}
                   </Button>
                 </>
               ) : (
@@ -277,10 +283,10 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
                   variant="outline"
                   size="sm"
                   className={`${floatingButton} text-danger hover:bg-danger-soft`}
-                  aria-label="Empty trash"
+                  aria-label={t('emptyTrash')}
                 >
                   <Trash2 size={15} className="sm:mr-2" />
-                  <span className="hidden sm:inline">Empty trash</span>
+                  <span className="hidden sm:inline">{t('emptyTrash')}</span>
                 </Button>
               )
             )}
@@ -292,10 +298,10 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
               variant="outline"
               size="sm"
               className={floatingButton}
-              aria-label="Back to notes"
+              aria-label={t('backToNotes')}
             >
               <RotateCcw size={15} className="sm:mr-2" />
-              <span className="hidden sm:inline">Back to notes</span>
+              <span className="hidden sm:inline">{t('backToNotes')}</span>
             </Button>
           </>
         ) : (
@@ -305,20 +311,20 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
               variant="outline"
               size="sm"
               className={floatingButton}
-              aria-label={`Trash (${deletedNotes.length})`}
+              aria-label={t('trashCount', { count: deletedNotes.length })}
             >
               <Trash2 size={15} className="mr-1.5 sm:mr-2" />
-              <span className="hidden sm:inline">Trash</span>
+              <span className="hidden sm:inline">{t('trash')}</span>
               <span className="tabular-nums text-ink-muted sm:ml-1.5">{deletedNotes.length}</span>
             </Button>
             <Button
               onClick={handleCreateStickyNote}
               size="sm"
               className="h-9 shadow-md sm:h-8"
-              aria-label="Add note"
+              aria-label={t('add')}
             >
               <Plus size={15} className="sm:mr-1.5" />
-              <span className="hidden sm:inline">Add note</span>
+              <span className="hidden sm:inline">{t('add')}</span>
             </Button>
           </>
         )}
@@ -331,8 +337,8 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
               <div className="flex h-full items-center justify-center">
                 <div className="text-center">
                   <div className="mb-4 text-6xl">🗑️</div>
-                  <h2 className="mb-2 text-xl font-semibold text-ink">The trash is empty</h2>
-                  <p className="text-ink-muted">Deleted sticky notes will appear here</p>
+                  <h2 className="mb-2 text-xl font-semibold text-ink">{t('trashEmpty.title')}</h2>
+                  <p className="text-ink-muted">{t('trashEmpty.description')}</p>
                 </div>
               </div>
             ) : (
@@ -345,8 +351,8 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
                     <button
                       onClick={() => handleRestoreStickyNote(note.id)}
                       className="sticky-menu absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg border shadow-md transition-transform hover:scale-110"
-                      title="Restore note"
-                      aria-label="Restore note"
+                      title={t('restore')}
+                      aria-label={t('restore')}
                     >
                       <RotateCcw size={15} />
                     </button>
@@ -356,11 +362,11 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
                           {note.content}
                         </ReactMarkdown>
                       ) : (
-                        <span className="sticky-muted">Empty note</span>
+                        <span className="sticky-muted">{t('emptyNote')}</span>
                       )}
                     </div>
                     <div className="sticky-rule sticky-muted mt-2 border-t pt-2 text-xs">
-                      Deleted {new Date(note.deleted_at!).toLocaleDateString()}
+                      {t('deleted', { date: new Date(note.deleted_at!).toLocaleDateString(locale) })}
                     </div>
                   </div>
                 ))}
@@ -371,6 +377,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            accessibility={dndAccessibility}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
@@ -399,7 +406,7 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
                         {activeStickyNote.content}
                       </ReactMarkdown>
                     ) : (
-                      <span className="sticky-muted">Write your note...</span>
+                      <span className="sticky-muted">{t('placeholder')}</span>
                     )}
                   </div>
                 </div>
@@ -412,11 +419,11 @@ export function Corkboard({ highlightId = null }: { highlightId?: number | null 
           <div className="flex h-full items-center justify-center p-6">
             <div className="text-center">
               <div className="mb-4 text-6xl">📋</div>
-              <h2 className="mb-2 text-xl font-semibold text-ink">No sticky notes yet</h2>
-              <p className="mb-5 text-ink-muted">Create your first sticky note to get started</p>
+              <h2 className="mb-2 text-xl font-semibold text-ink">{t('empty.title')}</h2>
+              <p className="mb-5 text-ink-muted">{t('empty.description')}</p>
               <Button onClick={handleCreateStickyNote} className="h-11 text-base sm:h-10 sm:text-sm">
                 <Plus size={16} className="mr-2" />
-                Create Sticky Note
+                {t('empty.create')}
               </Button>
             </div>
           </div>

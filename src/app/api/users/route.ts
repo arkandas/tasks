@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { getTranslations } from 'next-intl/server';
 import { authOptions } from '@/lib/auth';
 import { authConfig } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
@@ -7,12 +8,14 @@ import bcrypt from 'bcryptjs';
 import { LIMITS, requiredText, isEmail, isUserRole } from '@/lib/validate';
 
 export async function GET() {
+  const t = await getTranslations('errors');
+
   try {
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== 'ADMIN') {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: t('unauthorized') },
         { status: 401 }
       );
     }
@@ -32,16 +35,18 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch users' },
+      { error: t('fetchUsersFailed') },
       { status: 500 }
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  const t = await getTranslations('errors');
+
   if (authConfig.mode === 'oidc') {
     return NextResponse.json(
-      { error: 'Users are managed by the identity provider' },
+      { error: t('usersManagedByProvider') },
       { status: 403 }
     );
   }
@@ -56,7 +61,7 @@ export async function POST(request: NextRequest) {
       const session = await getServerSession(authOptions);
       if (!session || session.user.role !== 'ADMIN') {
         return NextResponse.json(
-          { error: 'Unauthorized' },
+          { error: t('unauthorized') },
           { status: 401 }
         );
       }
@@ -68,28 +73,28 @@ export async function POST(request: NextRequest) {
 
     if (!username || !email || !password) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: t('missingFields') },
         { status: 400 }
       );
     }
 
     if (!isEmail(email)) {
       return NextResponse.json(
-        { error: 'Invalid email address' },
+        { error: t('invalidEmail') },
         { status: 400 }
       );
     }
 
     if (password.length < LIMITS.passwordMin || password.length > LIMITS.passwordMax) {
       return NextResponse.json(
-        { error: `Password must be between ${LIMITS.passwordMin} and ${LIMITS.passwordMax} characters` },
+        { error: t('passwordLength', { min: LIMITS.passwordMin, max: LIMITS.passwordMax }) },
         { status: 400 }
       );
     }
 
     if (body.role !== undefined && !isUserRole(body.role)) {
       return NextResponse.json(
-        { error: 'Invalid role' },
+        { error: t('invalidRole') },
         { status: 400 }
       );
     }
@@ -105,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Username or email already exists' },
+        { error: t('userExists') },
         { status: 400 }
       );
     }
@@ -134,7 +139,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating user:', error);
     return NextResponse.json(
-      { error: 'Failed to create user' },
+      { error: t('createUserFailed') },
       { status: 500 }
     );
   }

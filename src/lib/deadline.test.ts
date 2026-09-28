@@ -14,6 +14,12 @@ describe('formatDeadline', () => {
       expect(formatDeadline('2026-09-25T00:00:00.000Z')).toBe(new Date(2026, 8, 25).toLocaleDateString());
     }
   });
+
+  it('writes the date the way the chosen language does', () => {
+    process.env.TZ = 'America/Los_Angeles';
+    expect(formatDeadline('2026-09-25T00:00:00.000Z', 'en')).toBe('9/25/2026');
+    expect(formatDeadline('2026-09-25T00:00:00.000Z', 'es')).toBe('25/9/2026');
+  });
 });
 
 describe('isOverdue', () => {

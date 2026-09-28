@@ -4,8 +4,8 @@ function localDay(date: Date) {
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
-export function formatDeadline(deadline: string) {
-  return new Date(deadline).toLocaleDateString(undefined, { timeZone: 'UTC' });
+export function formatDeadline(deadline: string, locale?: string) {
+  return new Date(deadline).toLocaleDateString(locale, { timeZone: 'UTC' });
 }
 
 export function isOverdue(deadline: string, now = new Date()) {

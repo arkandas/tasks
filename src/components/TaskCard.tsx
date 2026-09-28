@@ -3,6 +3,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useLocale, useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Task } from '@/types';
@@ -20,6 +21,10 @@ interface TaskCardProps {
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
 export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isHighlighted = false }: TaskCardProps) {
+  const t = useTranslations('task');
+  const tPriority = useTranslations('priority');
+  const tDrag = useTranslations('dragAndDrop');
+  const locale = useLocale();
   const {
     attributes,
     listeners,
@@ -33,6 +38,7 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
       type: 'task',
       task,
     },
+    attributes: { roleDescription: tDrag('sortable') },
   });
 
   const style = {
@@ -76,8 +82,8 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
                 onRequestEdit(task);
               }}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-raised hover:text-accent sm:h-7 sm:w-7"
-              title="Edit task"
-              aria-label="Edit task"
+              title={t('edit')}
+              aria-label={t('edit')}
             >
               <Edit2 size={14} />
             </button>
@@ -87,8 +93,8 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
                 onDelete(task.id);
               }}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-danger-soft hover:text-danger sm:h-7 sm:w-7"
-              title="Delete task"
-              aria-label="Delete task"
+              title={t('delete')}
+              aria-label={t('delete')}
             >
               <Trash2 size={14} />
             </button>
@@ -116,8 +122,8 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
         )}
 
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pt-0.5">
-          <span className="priority-chip rounded-full border px-2 py-0.5 text-[11px] font-semibold capitalize leading-4">
-            {priority}
+          <span className="priority-chip rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-4">
+            {tPriority(priority)}
           </span>
 
           {task.deadline && (
@@ -129,7 +135,7 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
               }`}
             >
               <Calendar size={12} />
-              {formatDeadline(task.deadline)}
+              {formatDeadline(task.deadline, locale)}
               {overdue && <Clock size={12} />}
             </span>
           )}

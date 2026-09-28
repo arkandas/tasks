@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { DragEndEvent } from '@dnd-kit/core';
+import { useTranslations } from 'next-intl';
 import { Board as BoardType, SearchHit } from '@/types';
 import { Board } from '@/components/Board';
 import { BoardSidebar } from '@/components/BoardSidebar';
@@ -22,12 +23,15 @@ import { Plus, Folder, StickyNote, Layout, ListTodo, X } from 'lucide-react';
 type View = 'boards' | 'todos' | 'corkboard';
 
 const VIEWS = [
-  { view: 'boards', icon: Layout, label: 'Boards' },
-  { view: 'todos', icon: ListTodo, label: 'To-Do' },
-  { view: 'corkboard', icon: StickyNote, label: 'Sticky Notes' },
+  { view: 'boards', icon: Layout, label: 'boards' },
+  { view: 'todos', icon: ListTodo, label: 'todos' },
+  { view: 'corkboard', icon: StickyNote, label: 'stickyNotes' },
 ] as const;
 
 export default function HomePage() {
+  const t = useTranslations('boards');
+  const tViews = useTranslations('views');
+  const tCommon = useTranslations('common');
   const [currentView, setCurrentView] = useState<View>('boards');
   const [boards, setBoards] = useState<BoardType[]>([]);
   const [selectedBoard, setSelectedBoard] = useState<BoardType | null>(null);
@@ -36,7 +40,7 @@ export default function HomePage() {
   const [newBoardTitle, setNewBoardTitle] = useState('');
   const [newBoardDescription, setNewBoardDescription] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   const [showBoardDrawer, setShowBoardDrawer] = useState(false);
   const [searchHit, setSearchHit] = useState<SearchHit | null>(null);
   const hasLoadedInitialBoard = useRef(false);
@@ -55,7 +59,7 @@ export default function HomePage() {
       })
       .catch(error => {
         console.error('Failed to load boards:', error);
-        setError('Unable to load your boards. Please check your database connection.');
+        setError(true);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -66,7 +70,7 @@ export default function HomePage() {
 
   const retryLoadBoards = () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     loadBoards();
   };
 
@@ -232,7 +236,7 @@ export default function HomePage() {
   if (error) {
     return (
       <div className="app-shell bg-canvas">
-        <ErrorScreen error={error} onRetry={retryLoadBoards} />
+        <ErrorScreen type="database" error={t('loadFailed')} onRetry={retryLoadBoards} />
       </div>
     );
   }
@@ -246,7 +250,7 @@ export default function HomePage() {
             <span className="hidden text-[15px] font-bold tracking-tight text-ink min-[360px]:inline">Tasks</span>
           </div>
 
-          <nav aria-label="Views" className="flex items-center gap-0.5 rounded-lg border border-line bg-muted p-0.5 dark:bg-canvas">
+          <nav aria-label={tViews('label')} className="flex items-center gap-0.5 rounded-lg border border-line bg-muted p-0.5 dark:bg-canvas">
             {VIEWS.map(({ view, icon: Icon, label }) => (
               <button
                 key={view}
@@ -254,8 +258,8 @@ export default function HomePage() {
                   setCurrentView(view);
                   setShowBoardDrawer(false);
                 }}
-                title={label}
-                aria-label={label}
+                title={tViews(label)}
+                aria-label={tViews(label)}
                 aria-current={currentView === view ? 'page' : undefined}
                 className={`flex h-9 items-center gap-1.5 rounded-md px-3 text-[13px] transition-colors sm:h-8 ${
                   currentView === view
@@ -264,7 +268,7 @@ export default function HomePage() {
                 }`}
               >
                 <Icon size={16} />
-                <span className="hidden sm:inline">{label}</span>
+                <span className="hidden sm:inline">{tViews(label)}</span>
               </button>
             ))}
           </nav>
@@ -308,14 +312,14 @@ export default function HomePage() {
                   showBoardDrawer ? 'visible translate-x-0' : 'invisible -translate-x-full'
                 }`}
                 role="dialog"
-                aria-label="Boards"
+                aria-label={tViews('boards')}
               >
                 <div className="flex h-14 shrink-0 items-center justify-between border-b border-line pl-4 pr-2">
-                  <span className="text-base font-bold tracking-tight text-ink">Boards</span>
+                  <span className="text-base font-bold tracking-tight text-ink">{tViews('boards')}</span>
                   <button
                     onClick={() => setShowBoardDrawer(false)}
                     className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-muted hover:text-ink"
-                    aria-label="Close board list"
+                    aria-label={t('closeList')}
                   >
                     <X size={18} />
                   </button>
@@ -338,7 +342,7 @@ export default function HomePage() {
               <Dialog open={isCreatingBoard} onClose={handleCancelCreateBoard}>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create New Board</DialogTitle>
+                    <DialogTitle>{t('create.title')}</DialogTitle>
                     <DialogClose onClick={handleCancelCreateBoard} />
                   </DialogHeader>
                   <form
@@ -349,22 +353,22 @@ export default function HomePage() {
                     className="space-y-4 sm:space-y-5"
                   >
                     <div>
-                      <label htmlFor="board-title" className="mb-1.5 block text-sm font-medium text-ink-muted">Board Title</label>
+                      <label htmlFor="board-title" className="mb-1.5 block text-sm font-medium text-ink-muted">{t('create.titleLabel')}</label>
                       <Input
                         id="board-title"
                         value={newBoardTitle}
                         onChange={(e) => setNewBoardTitle(e.target.value)}
-                        placeholder="Enter board title..."
+                        placeholder={t('create.titlePlaceholder')}
                         autoFocus
                       />
                     </div>
                     <div>
-                      <label htmlFor="board-description" className="mb-1.5 block text-sm font-medium text-ink-muted">Description (Optional)</label>
+                      <label htmlFor="board-description" className="mb-1.5 block text-sm font-medium text-ink-muted">{t('create.descriptionLabel')}</label>
                       <Textarea
                         id="board-description"
                         value={newBoardDescription}
                         onChange={(e) => setNewBoardDescription(e.target.value)}
-                        placeholder="Describe what this board is for..."
+                        placeholder={t('create.descriptionPlaceholder')}
                         rows={3}
                       />
                     </div>
@@ -375,10 +379,10 @@ export default function HomePage() {
                         className="w-full sm:w-auto"
                         onClick={handleCancelCreateBoard}
                       >
-                        Cancel
+                        {tCommon('cancel')}
                       </Button>
                       <Button type="submit" className="w-full sm:w-auto" disabled={!newBoardTitle.trim()}>
-                        Create Board
+                        {t('create.submit')}
                       </Button>
                     </div>
                   </form>
@@ -397,25 +401,25 @@ export default function HomePage() {
                 <div className="flex h-full items-center justify-center p-6">
                   <div className="text-center">
                     <Folder size={64} className="mx-auto mb-4 text-ink-faint" />
-                    <h2 className="mb-2 text-xl font-semibold text-ink">No boards yet</h2>
-                    <p className="mb-5 text-ink-muted">Create your first board to get started</p>
+                    <h2 className="mb-2 text-xl font-semibold text-ink">{t('empty.title')}</h2>
+                    <p className="mb-5 text-ink-muted">{t('empty.description')}</p>
                     <Button onClick={() => setIsCreatingBoard(true)} className="h-11 text-base sm:h-10 sm:text-sm">
                       <Plus size={16} className="mr-2" />
-                      Create Board
+                      {t('create.submit')}
                     </Button>
                   </div>
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center p-6">
                   <div className="text-center">
-                    <h2 className="mb-2 text-xl font-semibold text-ink">Select a board</h2>
+                    <h2 className="mb-2 text-xl font-semibold text-ink">{t('select.title')}</h2>
                     <p className="text-ink-muted">
-                      <span className="hidden md:inline">Choose a board from the sidebar to view its contents</span>
-                      <span className="md:hidden">Choose a board to view its contents</span>
+                      <span className="hidden md:inline">{t('select.fromSidebar')}</span>
+                      <span className="md:hidden">{t('select.fromList')}</span>
                     </p>
                     <Button className="mt-4 h-11 text-base md:hidden" onClick={() => setShowBoardDrawer(true)}>
                       <Layout size={16} className="mr-2" />
-                      Browse boards
+                      {t('select.browse')}
                     </Button>
                   </div>
                 </div>

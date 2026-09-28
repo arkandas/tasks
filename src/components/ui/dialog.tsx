@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 
 interface DialogProps {
@@ -188,12 +189,14 @@ interface DialogCloseProps {
 }
 
 export function DialogClose({ onClick }: DialogCloseProps) {
+  const t = useTranslations('common');
+
   return (
     <button
       type="button"
       onClick={onClick}
       className="-mr-2 flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-muted hover:text-ink"
-      aria-label="Close"
+      aria-label={t('close')}
     >
       <X size={18} />
     </button>

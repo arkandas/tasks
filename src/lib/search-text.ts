@@ -22,7 +22,7 @@ export function snippet(text: string | null, query: string) {
 }
 
 export function firstLine(text: string) {
-  return plainText(text.trim().split('\n')[0]) || 'Empty note';
+  return plainText(text.trim().split('\n')[0]);
 }
 
 export function escapeLikePattern(query: string) {

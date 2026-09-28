@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 
@@ -16,11 +17,13 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   open,
   title,
-  confirmLabel = 'Delete',
+  confirmLabel,
   onConfirm,
   onCancel,
   children,
 }: ConfirmDialogProps) {
+  const t = useTranslations('common');
+
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogContent>
@@ -32,10 +35,10 @@ export function ConfirmDialog({
           <div className="text-ink-muted">{children}</div>
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button variant="outline" onClick={onCancel} className="w-full sm:w-auto">
-              Cancel
+              {t('cancel')}
             </Button>
             <Button variant="destructive" onClick={onConfirm} className="w-full sm:w-auto" autoFocus>
-              {confirmLabel}
+              {confirmLabel ?? t('delete')}
             </Button>
           </div>
         </div>

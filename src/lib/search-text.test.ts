@@ -40,8 +40,8 @@ describe('firstLine', () => {
     expect(firstLine('**Standup** at 9:30\n\nRoom 2')).toBe('Standup at 9:30');
   });
 
-  it('labels a note that has no text', () => {
-    expect(firstLine('   ')).toBe('Empty note');
+  it('is empty for a note that has no text', () => {
+    expect(firstLine('   ')).toBe('');
   });
 });
 

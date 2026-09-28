@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useTranslations } from 'next-intl';
 import { Section, Task, UpdateSection } from '@/types';
 import { TaskCard } from './TaskCard';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,8 @@ export function SectionColumn({
   isBeingDraggedOver = false,
   highlightTaskId = null,
 }: SectionColumnProps) {
+  const t = useTranslations('section');
+  const tCommon = useTranslations('common');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [sectionTitle, setSectionTitle] = useState(section.title);
 
@@ -88,12 +91,12 @@ export function SectionColumn({
                 if (e.key === 'Enter') handleUpdateSectionTitle();
                 if (e.key === 'Escape') handleCancelEdit();
               }}
-              aria-label="Section title"
+              aria-label={t('titleLabel')}
               className="h-9 px-2.5 sm:h-8"
               autoFocus
             />
             <Button size="sm" onClick={handleUpdateSectionTitle}>
-              Save
+              {tCommon('save')}
             </Button>
           </div>
         ) : (
@@ -103,7 +106,7 @@ export function SectionColumn({
                 type="button"
                 className="min-w-0 truncate text-sm font-semibold text-ink transition-colors hover:text-accent"
                 onClick={() => setIsEditingTitle(true)}
-                title={`${section.title} (click to rename)`}
+                title={t('rename', { title: section.title })}
               >
                 {section.title}
               </button>
@@ -112,8 +115,8 @@ export function SectionColumn({
             <button
               onClick={() => onDeleteSection(section.id)}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-danger-soft hover:text-danger sm:h-8 sm:w-8"
-              title="Delete section"
-              aria-label="Delete section"
+              title={t('delete')}
+              aria-label={t('delete')}
             >
               <Trash2 size={15} />
             </button>
@@ -143,7 +146,7 @@ export function SectionColumn({
                   : 'border-line-strong text-ink-faint'
               }`}
             >
-              Drop tasks here
+              {t('dropHere')}
             </div>
           )}
         </div>
@@ -155,7 +158,7 @@ export function SectionColumn({
             className="flex h-11 w-full items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-muted hover:text-ink sm:h-9"
           >
             <Plus size={16} />
-            Add task
+            {t('addTask')}
           </button>
         </div>
       </div>

@@ -14,6 +14,7 @@ A self-hosted kanban board, to-do list, and sticky notes app.
 * A to-do list with deadlines and drag-and-drop reordering
 * Sticky notes with nine colors, Markdown support, and a trash that keeps the 50 most recent deleted notes
 * Search across tasks, to-dos, and sticky notes, with links directly to each result
+* English and Spanish
 * Light and dark themes, with an option to follow the system theme
 * Mobile support: swipe between sections and press and hold to drag
 * Multiple users, each with their own boards, to-dos, and notes

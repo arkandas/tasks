@@ -3,13 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getProviders } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { TasksMark } from '@/components/TasksMark';
+import { LIMITS } from '@/lib/validate';
 
 export default function SetupPage() {
+  const t = useTranslations('setup');
+  const tErrors = useTranslations('errors');
   const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
@@ -48,12 +53,12 @@ export default function SetupPage() {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordMismatch'));
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (formData.password.length < LIMITS.passwordMin) {
+      setError(t('passwordTooShort', { min: LIMITS.passwordMin }));
       return;
     }
 
@@ -75,12 +80,12 @@ export default function SetupPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to create user');
+        throw new Error(data.error || tErrors('createUserFailed'));
       }
 
       router.push('/login?setup=success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : tErrors('generic'));
     } finally {
       setLoading(false);
     }
@@ -90,7 +95,8 @@ export default function SetupPage() {
 
   return (
     <div className="login-page relative flex min-h-dvh items-center justify-center px-5">
-      <div className="absolute right-4 top-4">
+      <div className="absolute right-4 top-4 flex items-center gap-1">
+        <LanguageToggle />
         <ThemeToggle />
       </div>
 
@@ -99,7 +105,7 @@ export default function SetupPage() {
           <TasksMark size={52} />
           <span className="flex flex-col">
             <span className="text-[29px] font-semibold leading-none tracking-tight text-ink">Tasks</span>
-            <span className="mt-2 text-[15px] text-ink-muted">Create the administrator account</span>
+            <span className="mt-2 text-[15px] text-ink-muted">{t('tagline')}</span>
           </span>
         </header>
 
@@ -107,7 +113,7 @@ export default function SetupPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="username" className={label}>
-                Username
+                {t('username')}
               </label>
               <Input
                 id="username"
@@ -123,7 +129,7 @@ export default function SetupPage() {
 
             <div>
               <label htmlFor="email" className={label}>
-                Email
+                {t('email')}
               </label>
               <Input
                 id="email"
@@ -138,24 +144,24 @@ export default function SetupPage() {
 
             <div>
               <label htmlFor="password" className={label}>
-                Password
+                {t('password')}
               </label>
               <Input
                 id="password"
                 type="password"
                 name="password"
                 autoComplete="new-password"
-                minLength={6}
+                minLength={LIMITS.passwordMin}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                placeholder="At least 6 characters"
+                placeholder={t('passwordHint', { min: LIMITS.passwordMin })}
               />
             </div>
 
             <div>
               <label htmlFor="confirmPassword" className={label}>
-                Confirm Password
+                {t('confirmPassword')}
               </label>
               <Input
                 id="confirmPassword"
@@ -186,16 +192,16 @@ export default function SetupPage() {
               {loading ? (
                 <>
                   <Loader2 size={16} className="mr-2 animate-spin" />
-                  Creating account…
+                  {t('submitting')}
                 </>
               ) : (
-                'Create admin account'
+                t('submit')
               )}
             </Button>
           </form>
 
           <p className="mt-5 text-center text-sm text-ink-muted">
-            This account has administrator privileges. You can add more users later.
+            {t('note')}
           </p>
         </div>
       </main>

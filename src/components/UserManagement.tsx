@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Select } from './ui/select';
+import { LIMITS } from '@/lib/validate';
 import { X, Trash2, UserPlus, Shield, User, AlertTriangle } from 'lucide-react';
 
 interface User {
@@ -23,6 +25,10 @@ interface UserManagementProps {
 const EMPTY_FORM = { username: '', email: '', password: '', role: 'USER' as 'ADMIN' | 'USER' };
 
 export function UserManagement({ isOpen, onClose }: UserManagementProps) {
+  const t = useTranslations('users');
+  const tCommon = useTranslations('common');
+  const tRoles = useTranslations('roles');
+  const tErrors = useTranslations('errors');
   const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,14 +78,14 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to create user');
+        throw new Error(data.error || tErrors('createUserFailed'));
       }
 
       await loadUsers();
       setShowCreateForm(false);
       setFormData(EMPTY_FORM);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : tErrors('generic'));
     }
   };
 
@@ -93,12 +99,12 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to delete user');
+        throw new Error(data.error || tErrors('deleteUserFailed'));
       }
 
       await loadUsers();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Failed to delete user');
+      setDeleteError(err instanceof Error ? err.message : tErrors('deleteUserFailed'));
     } finally {
       setConfirmDeleteId(null);
     }
@@ -112,14 +118,14 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="User Management"
+        aria-label={t('title')}
         className="dialog-panel relative z-10 flex w-full max-w-3xl flex-col rounded-2xl border border-line-strong bg-surface shadow-2xl"
       >
         <div className="flex items-center justify-between rounded-t-2xl border-b border-line bg-raised px-4 py-3 sm:px-6 sm:py-4">
-          <h2 className="text-lg font-bold text-ink sm:text-xl">User Management</h2>
+          <h2 className="text-lg font-bold text-ink sm:text-xl">{t('title')}</h2>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={tCommon('close')}
             className="-mr-2 flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-muted hover:text-ink"
           >
             <X size={18} />
@@ -129,11 +135,11 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
         <div className="flex-1 p-4 sm:p-6">
           {showCreateForm ? (
             <form onSubmit={handleCreateUser} className="mb-6 space-y-4">
-              <h3 className="mb-4 text-base font-semibold text-ink">Create New User</h3>
+              <h3 className="mb-4 text-base font-semibold text-ink">{t('createTitle')}</h3>
 
               <div>
                 <label htmlFor="new-username" className="mb-1.5 block text-sm font-medium text-ink-muted">
-                  Username
+                  {t('username')}
                 </label>
                 <Input
                   id="new-username"
@@ -142,13 +148,13 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   required
-                  placeholder="Enter username"
+                  placeholder={t('usernamePlaceholder')}
                 />
               </div>
 
               <div>
                 <label htmlFor="new-email" className="mb-1.5 block text-sm font-medium text-ink-muted">
-                  Email
+                  {t('email')}
                 </label>
                 <Input
                   id="new-email"
@@ -157,37 +163,37 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  placeholder="Enter email"
+                  placeholder={t('emailPlaceholder')}
                 />
               </div>
 
               <div>
                 <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium text-ink-muted">
-                  Password
+                  {t('password')}
                 </label>
                 <Input
                   id="new-password"
                   type="password"
                   autoComplete="new-password"
-                  minLength={6}
+                  minLength={LIMITS.passwordMin}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  placeholder="Enter password (min. 6 characters)"
+                  placeholder={t('passwordPlaceholder', { min: LIMITS.passwordMin })}
                 />
               </div>
 
               <div>
                 <label htmlFor="new-role" className="mb-1.5 block text-sm font-medium text-ink-muted">
-                  Role
+                  {t('role')}
                 </label>
                 <Select
                   id="new-role"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'ADMIN' | 'USER' })}
                 >
-                  <option value="USER">User</option>
-                  <option value="ADMIN">Admin</option>
+                  <option value="USER">{tRoles('USER')}</option>
+                  <option value="ADMIN">{tRoles('ADMIN')}</option>
                 </Select>
               </div>
 
@@ -200,7 +206,7 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 
               <div className="flex gap-3">
                 <Button type="submit">
-                  Create User
+                  {t('create')}
                 </Button>
                 <Button
                   type="button"
@@ -211,20 +217,20 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
                     setError('');
                   }}
                 >
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
               </div>
             </form>
           ) : (
             <Button onClick={() => setShowCreateForm(true)} className="mb-6">
               <UserPlus size={16} className="mr-2" />
-              Add New User
+              {t('add')}
             </Button>
           )}
 
           <div>
             <h3 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
-              Users
+              {t('list')}
               <span className="tabular-nums">{users.length}</span>
             </h3>
 
@@ -236,7 +242,7 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
             )}
 
             {loading && users.length === 0 ? (
-              <div className="py-8 text-center text-sm text-ink-muted">Loading users...</div>
+              <div className="py-8 text-center text-sm text-ink-muted">{t('loading')}</div>
             ) : (
               <div className="space-y-2">
                 {users.map((user) => (
@@ -261,24 +267,24 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
                             onClick={() => handleDeleteUser(user.id)}
                             className="rounded-lg bg-danger px-2.5 py-1.5 text-xs font-semibold text-accent-ink"
                           >
-                            Delete
+                            {tCommon('delete')}
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(null)}
                             className="rounded-lg px-2 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:text-ink"
                           >
-                            Cancel
+                            {tCommon('cancel')}
                           </button>
                         </>
                       ) : (
                         <>
-                          <div className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${
+                          <div className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium uppercase ${
                             user.role === 'ADMIN'
                               ? 'bg-accent-soft text-accent'
                               : 'bg-canvas text-ink-muted'
                           }`}>
                             {user.role === 'ADMIN' ? <Shield size={12} /> : <User size={12} />}
-                            {user.role}
+                            {tRoles(user.role)}
                           </div>
 
                           {session?.user.id !== user.id.toString() && (
@@ -288,8 +294,8 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
                                 setConfirmDeleteId(user.id);
                               }}
                               className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-faint transition-colors hover:bg-danger-soft hover:text-danger"
-                              title="Delete user"
-                              aria-label={`Delete ${user.username}`}
+                              title={t('deleteUser')}
+                              aria-label={t('deleteNamed', { name: user.username })}
                             >
                               <Trash2 size={16} />
                             </button>

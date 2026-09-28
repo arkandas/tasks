@@ -16,8 +16,10 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useTranslations } from 'next-intl';
 import { Board, SearchHit, SearchResults } from '@/types';
 import { searchApi } from '@/lib/api';
+import { useDndAccessibility } from '@/lib/use-dnd-accessibility';
 import { firstLine, snippet } from '@/lib/search-text';
 import { Folder, Plus, Search, X } from 'lucide-react';
 
@@ -39,6 +41,8 @@ function SortableBoardRow({
   isSelected: boolean;
   onSelect: () => void;
 }) {
+  const t = useTranslations('boards');
+  const tDrag = useTranslations('dragAndDrop');
   const {
     attributes,
     listeners,
@@ -46,7 +50,7 @@ function SortableBoardRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: board.id });
+  } = useSortable({ id: board.id, attributes: { roleDescription: tDrag('sortable') } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -63,7 +67,7 @@ function SortableBoardRow({
             ? 'bg-accent text-accent-ink shadow-xs'
             : 'text-ink hover:bg-muted'
         }`}
-        title="Drag to reorder boards"
+        title={t('reorder')}
       >
         <Folder
           size={15}
@@ -86,6 +90,11 @@ export function BoardSidebar({
   onCreate,
   onOpenHit,
 }: BoardSidebarProps) {
+  const t = useTranslations('search');
+  const tBoards = useTranslations('boards');
+  const tViews = useTranslations('views');
+  const tStickyNotes = useTranslations('stickyNotes');
+  const dndAccessibility = useDndAccessibility();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<{ query: string; data: SearchResults } | null>(null);
   const trimmedQuery = query.trim();
@@ -137,15 +146,15 @@ export function BoardSidebar({
             onKeyDown={(e) => {
               if (e.key === 'Escape') setQuery('');
             }}
-            placeholder="Search…"
-            aria-label="Search tasks, to-dos and sticky notes"
+            placeholder={t('placeholder')}
+            aria-label={t('label')}
             className="h-9 w-full rounded-lg border border-line bg-raised pl-9 pr-8 text-base text-ink outline-hidden transition-colors placeholder:text-ink-faint focus:border-accent focus:ring-2 focus:ring-accent/25 md:h-8 md:text-sm"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
               className="absolute right-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-sm text-ink-faint hover:text-ink-muted"
-              aria-label="Clear search"
+              aria-label={t('clear')}
             >
               <X size={14} />
             </button>
@@ -157,16 +166,16 @@ export function BoardSidebar({
         {trimmedQuery ? (
           <div aria-live="polite">
             {!current && (
-              <p className="px-1 py-6 text-center text-xs text-ink-muted">Searching…</p>
+              <p className="px-1 py-6 text-center text-xs text-ink-muted">{t('searching')}</p>
             )}
 
             {current && total === 0 && (
-              <p className="px-1 py-6 text-center text-xs text-ink-muted">No results for “{trimmedQuery}”</p>
+              <p className="px-1 py-6 text-center text-xs text-ink-muted">{t('noResults', { query: trimmedQuery })}</p>
             )}
 
             {current && current.tasks.length > 0 && (
               <>
-                <div className={`${groupLabel} pt-1`}>Tasks</div>
+                <div className={`${groupLabel} pt-1`}>{t('tasks')}</div>
                 {current.tasks.map(task => (
                   <button
                     key={task.id}
@@ -195,7 +204,7 @@ export function BoardSidebar({
 
             {current && current.todos.length > 0 && (
               <>
-                <div className={groupLabel}>To-Do</div>
+                <div className={groupLabel}>{tViews('todos')}</div>
                 {current.todos.map(todo => (
                   <button
                     key={todo.id}
@@ -217,7 +226,7 @@ export function BoardSidebar({
 
             {current && current.stickyNotes.length > 0 && (
               <>
-                <div className={groupLabel}>Sticky Notes</div>
+                <div className={groupLabel}>{tViews('stickyNotes')}</div>
                 {current.stickyNotes.map(note => (
                   <button
                     key={note.id}
@@ -230,7 +239,7 @@ export function BoardSidebar({
                         style={{ backgroundColor: 'var(--sticky)', borderColor: 'var(--sticky-edge)' }}
                       />
                       <span className="truncate text-sm font-medium text-ink">
-                        {snippet(note.content, trimmedQuery) ?? firstLine(note.content)}
+                        {snippet(note.content, trimmedQuery) ?? (firstLine(note.content) || tStickyNotes('emptyNote'))}
                       </span>
                     </span>
                   </button>
@@ -243,6 +252,7 @@ export function BoardSidebar({
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              accessibility={dndAccessibility}
               onDragEnd={onReorder}
             >
               <SortableContext
@@ -262,7 +272,7 @@ export function BoardSidebar({
               </SortableContext>
             </DndContext>
             {boards.length === 0 && (
-              <p className="px-1 py-6 text-center text-xs text-ink-muted">No boards yet</p>
+              <p className="px-1 py-6 text-center text-xs text-ink-muted">{tBoards('empty.title')}</p>
             )}
             <button
               type="button"
@@ -270,7 +280,7 @@ export function BoardSidebar({
               className="mt-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-ink-muted transition-colors hover:bg-muted hover:text-ink md:py-2"
             >
               <Plus size={15} className="shrink-0" />
-              New board
+              {tBoards('new')}
             </button>
           </>
         )}

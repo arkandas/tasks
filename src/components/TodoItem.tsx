@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { TodoItem as TodoItemType } from '@/types';
@@ -19,6 +20,9 @@ interface TodoItemProps {
 }
 
 export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOverlay = false, isHighlighted = false }: TodoItemProps) {
+  const t = useTranslations('todos');
+  const tDrag = useTranslations('dragAndDrop');
+  const locale = useLocale();
   const {
     attributes,
     listeners,
@@ -32,6 +36,7 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
       type: 'todo',
       todo,
     },
+    attributes: { roleDescription: tDrag('sortable') },
   });
 
   const style = {
@@ -64,8 +69,8 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
               ? 'border-accent bg-accent text-accent-ink'
               : 'border-line-strong hover:border-accent hover:bg-accent-soft'
           }`}
-          title={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
-          aria-label={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
+          title={todo.completed ? t('markIncomplete') : t('markComplete')}
+          aria-label={todo.completed ? t('markIncomplete') : t('markComplete')}
           aria-pressed={todo.completed}
         >
           {todo.completed && <Check size={15} strokeWidth={3} />}
@@ -85,8 +90,8 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
                   onRequestEdit(todo);
                 }}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-accent-soft hover:text-accent sm:h-8 sm:w-8"
-                title="Edit item"
-                aria-label="Edit item"
+                title={t('edit')}
+                aria-label={t('edit')}
               >
                 <Edit2 size={15} />
               </button>
@@ -96,8 +101,8 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
                   onDelete(todo.id);
                 }}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-danger-soft hover:text-danger sm:h-8 sm:w-8"
-                title="Delete item"
-                aria-label="Delete item"
+                title={t('delete')}
+                aria-label={t('delete')}
               >
                 <Trash2 size={15} />
               </button>
@@ -134,7 +139,7 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
                   : 'border-line bg-canvas text-ink-muted'
               }`}>
                 {overdue ? <Clock size={12} /> : <Calendar size={12} />}
-                {formatDeadline(todo.deadline)}
+                {formatDeadline(todo.deadline, locale)}
               </span>
             </div>
           )}

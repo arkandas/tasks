@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
   AlertTriangle,
@@ -11,13 +12,16 @@ import {
   HelpCircle
 } from 'lucide-react';
 
+type ErrorType = 'database' | 'network' | 'timeout' | 'general';
+
 interface ErrorScreenProps {
   error?: string | null;
+  type?: ErrorType;
   onRetry?: () => void;
   showRetry?: boolean;
 }
 
-const getErrorType = (error: string) => {
+const getErrorType = (error: string): ErrorType => {
   const errorLower = error.toLowerCase();
 
   if (errorLower.includes('database') || errorLower.includes('prisma') || errorLower.includes('connection')) {
@@ -32,61 +36,20 @@ const getErrorType = (error: string) => {
   return 'general';
 };
 
-const getErrorDetails = (error: string) => {
-  const type = getErrorType(error);
-
-  switch (type) {
-    case 'database':
-      return {
-        icon: Database,
-        title: 'Database Connection Issue',
-        description: 'Unable to connect to the database. This might be a temporary issue.',
-        suggestions: [
-          'Check if the database is running',
-          'Verify database connection settings',
-          'Try refreshing the page'
-        ],
-      };
-    case 'network':
-      return {
-        icon: Zap,
-        title: 'Network Connection Error',
-        description: 'Unable to reach the server. Please check your internet connection.',
-        suggestions: [
-          'Check your internet connection',
-          'Try refreshing the page',
-          'Wait a moment and try again'
-        ],
-      };
-    case 'timeout':
-      return {
-        icon: RefreshCw,
-        title: 'Request Timeout',
-        description: 'The request took too long to complete.',
-        suggestions: [
-          'The server might be busy',
-          'Try again in a moment',
-          'Check your connection speed'
-        ],
-      };
-    default:
-      return {
-        icon: AlertTriangle,
-        title: 'Something went wrong',
-        description: 'An unexpected error occurred while loading your data.',
-        suggestions: [
-          'Try refreshing the page',
-          'Check if the issue persists',
-          'Check the server logs if the problem continues'
-        ],
-      };
-  }
+const ERROR_ICONS = {
+  database: Database,
+  network: Zap,
+  timeout: RefreshCw,
+  general: AlertTriangle,
 };
 
-export function ErrorScreen({ error = 'An unexpected error occurred', onRetry, showRetry = true }: ErrorScreenProps) {
-  const message = error || 'An unexpected error occurred';
-  const errorDetails = getErrorDetails(message);
-  const IconComponent = errorDetails.icon;
+const TIPS = ['tip1', 'tip2', 'tip3'] as const;
+
+export function ErrorScreen({ error, type, onRetry, showRetry = true }: ErrorScreenProps) {
+  const t = useTranslations('errorScreen');
+  const message = error || t('unexpected');
+  const errorType = type ?? getErrorType(message);
+  const IconComponent = ERROR_ICONS[errorType];
 
   return (
     <div className="themed-scroll flex h-full min-h-[60dvh] items-center justify-center overflow-y-auto bg-canvas p-4">
@@ -97,17 +60,17 @@ export function ErrorScreen({ error = 'An unexpected error occurred', onRetry, s
           </div>
 
           <h1 className="mb-2 text-xl font-bold text-ink">
-            {errorDetails.title}
+            {t(`${errorType}.title`)}
           </h1>
 
           <p className="leading-relaxed text-ink-muted">
-            {errorDetails.description}
+            {t(`${errorType}.description`)}
           </p>
 
           {showRetry && onRetry && (
             <Button onClick={onRetry} className="mt-6 h-11 text-base sm:h-10 sm:text-sm">
               <RefreshCw size={16} className="mr-2" />
-              Try Again
+              {t('tryAgain')}
             </Button>
           )}
         </div>
@@ -115,13 +78,13 @@ export function ErrorScreen({ error = 'An unexpected error occurred', onRetry, s
         <div className="mt-4 rounded-xl border border-line bg-surface p-5">
           <div className="mb-3 flex items-center gap-2">
             <HelpCircle size={17} className="text-ink-faint" />
-            <h3 className="text-sm font-semibold text-ink">What you can try</h3>
+            <h3 className="text-sm font-semibold text-ink">{t('whatToTry')}</h3>
           </div>
           <ul className="space-y-2 text-sm text-ink-muted">
-            {errorDetails.suggestions.map((suggestion, index) => (
-              <li key={index} className="flex items-start gap-2.5">
+            {TIPS.map(tip => (
+              <li key={tip} className="flex items-start gap-2.5">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-line-strong" />
-                <span>{suggestion}</span>
+                <span>{t(`${errorType}.${tip}`)}</span>
               </li>
             ))}
           </ul>
@@ -130,7 +93,7 @@ export function ErrorScreen({ error = 'An unexpected error occurred', onRetry, s
         <details className="mt-4 rounded-xl border border-line bg-surface">
           <summary className="flex cursor-pointer items-center gap-2 p-4 text-sm text-ink-muted transition-colors hover:text-ink">
             <Settings size={15} />
-            Technical Details
+            {t('technicalDetails')}
           </summary>
           <div className="border-t border-line px-4 pb-4">
             <code className="mt-3 block break-all rounded-md bg-canvas p-2.5 font-mono text-xs text-ink-muted">
