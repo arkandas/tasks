@@ -8,17 +8,17 @@
     <style>
       .sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
       .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-      .col { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #8f8878; }
-      .title { font-size: 15px; font-weight: 600; fill: #24211b; }
-      .body { font-size: 12.5px; fill: #66604f; }
+      .col { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #828a96; }
+      .title { font-size: 15px; font-weight: 600; fill: #1a222e; }
+      .body { font-size: 12.5px; fill: #505967; }
       .path { font-size: 12px; fill: #047857; }
-      .label { font-size: 11px; fill: #8f8878; }
-      .box { fill: #fffefb; stroke: #dcd5c6; stroke-width: 1; }
+      .label { font-size: 11px; fill: #828a96; }
+      .box { fill: #ffffff; stroke: #e1e1e1; stroke-width: 1; }
       .arrow { stroke: #047857; stroke-width: 1.5; fill: none; }
     </style>
   </defs>
 
-  <rect width="960" height="511" rx="16" fill="#f2efe7"/>
+  <rect width="960" height="511" rx="16" fill="#efefef"/>
 
   <text class="sans col" x="24" y="36">BROWSER</text>
   <text class="sans col" x="354" y="36">NEXT.JS SERVER</text>

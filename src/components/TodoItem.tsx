@@ -54,9 +54,9 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
       {...attributes}
       {...listeners}
       data-todo-id={isOverlay ? undefined : todo.id}
-      className={`touch-draggable cursor-grab overflow-hidden rounded-xl border border-line p-3 transition-shadow duration-200 active:cursor-grabbing sm:px-4 ${
-        todo.completed ? 'bg-surface' : 'bg-card'
-      } ${isOverlay ? 'shadow-xl ring-1 ring-accent/40' : 'shadow-xs hover:shadow-md'} ${isHighlighted ? 'search-hit' : ''}`}
+      className={`touch-draggable card-surface cursor-grab overflow-hidden rounded-xl border p-3 transition-shadow duration-200 active:cursor-grabbing sm:px-4 ${
+        isOverlay ? 'shadow-xl ring-1 ring-accent/40' : ''
+      } ${isHighlighted ? 'search-hit' : ''}`}
     >
       <div className="flex items-start gap-3">
         <button
@@ -67,7 +67,7 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
           className={`mt-px flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 transition-colors duration-200 sm:h-6 sm:w-6 ${
             todo.completed
               ? 'border-accent bg-accent text-accent-ink'
-              : 'border-line-strong hover:border-accent hover:bg-accent-soft'
+              : 'check-edge hover:border-accent hover:bg-accent-soft'
           }`}
           title={todo.completed ? t('markIncomplete') : t('markComplete')}
           aria-label={todo.completed ? t('markIncomplete') : t('markComplete')}
@@ -79,7 +79,7 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className={`min-w-0 flex-1 break-words pt-0.5 text-[15px] font-semibold leading-snug ${
-              todo.completed ? 'text-ink-faint line-through' : 'text-ink'
+              todo.completed ? 'card-muted line-through' : 'text-ink'
             }`}>
               {todo.title}
             </h3>
@@ -110,8 +110,8 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
           </div>
 
           {todo.description && (
-            <div className={`markdown-content mt-1 text-sm leading-relaxed ${
-              todo.completed ? 'text-ink-faint line-through' : 'text-ink-muted'
+            <div className={`markdown-content card-muted mt-1 text-sm leading-relaxed ${
+              todo.completed ? 'line-through' : ''
             }`}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -135,8 +135,8 @@ export function TodoItem({ todo, onDelete, onRequestEdit, onToggleComplete, isOv
             <div className="mt-2.5 flex">
               <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${
                 overdue
-                  ? 'border-danger/40 bg-danger-soft text-danger'
-                  : 'border-line bg-canvas text-ink-muted'
+                  ? 'pill-overdue'
+                  : 'card-chip'
               }`}>
                 {overdue ? <Clock size={12} /> : <Calendar size={12} />}
                 {formatDeadline(todo.deadline, locale)}

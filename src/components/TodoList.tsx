@@ -225,7 +225,7 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
 
           {activeTodos.length > 0 && (
             <div className="space-y-2.5">
-              <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+              <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
                 <ListTodo size={14} />
                 {t('active')}
                 <span className="tabular-nums">{activeTodos.length}</span>
@@ -248,7 +248,7 @@ export function TodoList({ highlightId = null }: { highlightId?: number | null }
           {completedTodos.length > 0 && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+                <h3 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
                   <ListTodo size={14} />
                   {t('completed')}
                   <span className="tabular-nums">{completedTodos.length}</span>

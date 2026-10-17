@@ -59,8 +59,8 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
       {...attributes}
       {...listeners}
       data-task-id={isOverlay ? undefined : task.id}
-      className={`touch-draggable priority-${priority} priority-card cursor-grab overflow-hidden rounded-lg border p-3 transition-shadow duration-200 active:cursor-grabbing ${
-        isOverlay ? 'shadow-xl ring-1 ring-accent/40' : 'shadow-xs hover:shadow-md'
+      className={`touch-draggable priority-${priority} card-surface cursor-grab overflow-hidden rounded-xl border p-3 transition-shadow duration-200 active:cursor-grabbing ${
+        isOverlay ? 'shadow-xl ring-1 ring-accent/40' : ''
       } ${task.completed ? 'opacity-70' : ''} ${isHighlighted ? 'search-hit' : ''}`}
     >
       <div className="space-y-2">
@@ -81,7 +81,7 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
                 e.stopPropagation();
                 onRequestEdit(task);
               }}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-raised hover:text-accent sm:h-7 sm:w-7"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-ink/10 hover:text-accent sm:h-7 sm:w-7"
               title={t('edit')}
               aria-label={t('edit')}
             >
@@ -102,7 +102,7 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
         </div>
 
         {task.description && (
-          <div className="markdown-content text-[13px] leading-relaxed text-ink-muted">
+          <div className="markdown-content card-muted text-[13px] leading-relaxed">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -122,16 +122,16 @@ export function TaskCard({ task, onDelete, onRequestEdit, isOverlay = false, isH
         )}
 
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pt-0.5">
-          <span className="priority-chip rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-4">
+          <span className="priority-chip rounded-full px-1.5 py-px text-[11px] font-semibold leading-4">
             {tPriority(priority)}
           </span>
 
           {task.deadline && (
             <span
-              className={`flex items-center gap-1 text-xs font-medium ${
+              className={`flex items-center gap-1 ${
                 overdue
-                  ? 'rounded-md border border-danger/40 bg-danger-soft px-1.5 py-0.5 text-danger'
-                  : 'text-ink-muted'
+                  ? 'pill-overdue rounded-full px-1.5 py-px text-[11px] font-semibold leading-4'
+                  : 'card-muted text-xs font-medium'
               }`}
             >
               <Calendar size={12} />

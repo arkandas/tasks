@@ -81,7 +81,7 @@ export function SectionColumn({
           : 'border-line bg-surface'
       }`}
     >
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line py-1.5 pl-3 pr-1.5">
+      <div className="flex shrink-0 items-center justify-between gap-2 pb-0.5 pl-3 pr-1.5 pt-2">
         {isEditingTitle ? (
           <div className="flex flex-1 items-center gap-2 py-0.5">
             <Input
@@ -101,16 +101,16 @@ export function SectionColumn({
           </div>
         ) : (
           <>
-            <h2 className="flex min-w-0 flex-1 items-baseline gap-2">
+            <h2 className="flex min-w-0 flex-1 items-center gap-2">
               <button
                 type="button"
-                className="min-w-0 truncate text-sm font-semibold text-ink transition-colors hover:text-accent"
+                className="min-w-0 truncate text-sm font-bold text-ink transition-colors hover:text-accent"
                 onClick={() => setIsEditingTitle(true)}
                 title={t('rename', { title: section.title })}
               >
                 {section.title}
               </button>
-              <span className="shrink-0 text-xs font-medium tabular-nums text-ink-faint">{section.tasks.length}</span>
+              <span className="min-w-5 shrink-0 rounded-full bg-muted px-1.5 text-center text-[11px] font-semibold leading-5 tabular-nums text-ink-muted">{section.tasks.length}</span>
             </h2>
             <button
               onClick={() => onDeleteSection(section.id)}
@@ -125,7 +125,7 @@ export function SectionColumn({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col sm:min-h-[180px]">
-        <div className="themed-scroll min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain px-2.5 pb-1 pt-2.5 sm:overflow-visible">
+        <div className="themed-scroll min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain px-2.5 pb-1 pt-1.5 sm:overflow-visible">
           <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
             {section.tasks.map((task: Task) => (
               <TaskCard
